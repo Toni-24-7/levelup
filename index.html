@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#4a2d8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LevelUp">
+<link rel="manifest" href="manifest.json">
+<title>LevelUp — Accountability Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg1: #3b2070;
+  --bg2: #4a2d8a;
+  --bg3: #382068;
+  --card: rgba(255,255,255,0.10);
+  --card2: rgba(255,255,255,0.15);
+  --border: rgba(255,255,255,0.20);
+  --border2: rgba(255,255,255,0.10);
+  --a1: #ff6b6b;
+  --a2: #ffd93d;
+  --a3: #6bcb77;
+  --a4: #4d96ff;
+  --a5: #e0aaff;
+  --a6: #ff9500;
+  --txt: #f4eeff;
+  --muted: #c0a8e8;
+  --r: 16px;
+  --rs: 10px;
+  --sh: 0 6px 24px rgba(0,0,0,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(145deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);
+  background-attachment:fixed;
+  color:var(--txt);min-height:100vh;overflow-x:hidden;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 20% 15%,rgba(77,150,255,0.15) 0%,transparent 55%),
+             radial-gradient(ellipse at 80% 80%,rgba(199,125,255,0.12) 0%,transparent 55%);}
+.fredoka{font-family:'Fredoka One',cursive;}
+#app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-bottom:90px;}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 15px 8px;
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(180deg,var(--bg1) 60%,transparent);}
+.logo{font-family:'Fredoka One',cursive;font-size:1.75rem;color:var(--a2);}
+.logo span{color:var(--a5);}
+.badges{display:flex;gap:6px;align-items:center;}
+.badge{border-radius:20px;padding:5px 11px;font-weight:800;font-size:0.78rem;color:#fff;display:flex;align-items:center;gap:3px;}
+.badge-streak{background:linear-gradient(135deg,var(--a1),var(--a2));box-shadow:0 2px 10px rgba(255,107,107,0.4);}
+.badge-xp{background:linear-gradient(135deg,#7c3aed,var(--a4));box-shadow:0 2px 10px rgba(77,150,255,0.35);}
+
+/* LEVEL BAR */
+.lvl-wrap{padding:4px 15px 6px;}
+.lvl-top{display:flex;justify-content:space-between;margin-bottom:5px;}
+.lvl-name{font-family:'Fredoka One',cursive;font-size:0.92rem;color:var(--a2);}
+.lvl-xp{font-size:0.7rem;color:var(--muted);}
+.lvl-track{background:rgba(0,0,0,0.3);border-radius:99px;height:9px;overflow:hidden;border:1px solid var(--border2);}
+.lvl-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--a4),#c77dff);
+  transition:width 0.8s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 8px rgba(77,150,255,0.5);}
+
+/* TABS */
+.tabs{display:flex;gap:5px;padding:8px 14px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{background:rgba(255,255,255,0.08);border:1px solid var(--border2);border-radius:99px;
+  padding:6px 13px;font-family:'Fredoka One',cursive;font-size:0.88rem;color:var(--muted);
+  cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0;}
+.tab.on{background:linear-gradient(135deg,var(--a4),#c77dff);color:#fff;border-color:transparent;
+  box-shadow:0 2px 10px rgba(77,150,255,0.4);}
+
+/* VIEWS */
+.view{display:none;}.view.on{display:block;}
+
+/* CARD */
+.card{background:var(--card);backdrop-filter:blur(12px);border:1px solid var(--border);
+  border-radius:var(--r);padding:15px;margin:8px 13px;box-shadow:var(--sh);}
+.card-title{font-family:'Fredoka One',cursive;font-size:1.15rem;margin-bottom:10px;
+  display:flex;align-items:center;gap:7px;}
+
+/* WHERE LEFT OFF */
+.wlo{background:linear-gradient(135deg,rgba(77,150,255,0.18),rgba(199,125,255,0.12));
+  border:1px solid rgba(77,150,255,0.3);border-radius:var(--r);
+  padding:12px 14px;margin:8px 13px;display:flex;gap:10px;align-items:flex-start;}
+.wlo-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+.wlo-head{font-family:'Fredoka One',cursive;font-size:0.9rem;color:var(--a5);margin-bottom:2px;}
+.wlo-body{font-size:0.82rem;color:var(--muted);line-height:1.45;}
+
+/* CHECKIN */
+.ci-step{display:none;}.ci-step.on{display:block;}
+.ci-emoji{font-size:2.5rem;text-align:center;margin-bottom:8px;}
+.ci-q{font-family:'Fredoka One',cursive;font-size:1.1rem;text-align:center;margin-bottom:12px;}
+.mood-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;}
+.mood-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);
+  border-radius:var(--rs);padding:9px 8px;cursor:pointer;font-size:1.45rem;
+  transition:all 0.2s;text-align:center;min-width:54px;}
+.mood-btn:hover,.mood-btn.picked{border-color:var(--a4);background:rgba(77,150,255,0.2);transform:scale(1.1);}
+.mood-label{font-size:0.58rem;font-weight:700;color:var(--muted);margin-top:2px;}
+
+/* PROJECT ROWS */
+.proj-row{background:var(--card);border:1px solid var(--border2);border-radius:var(--rs);margin:7px 13px;overflow:hidden;}
+.proj-hdr{display:flex;align-items:center;gap:8px;padding:11px 12px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.proj-hdr:hover{background:rgba(255,255,255,0.05);}
+.proj-arr{font-size:0.7rem;color:var(--muted);transition:transform 0.25s;flex-shrink:0;}
+.proj-row.open .proj-arr{transform:rotate(90deg);}
+.proj-name{font-family:'Fredoka One',cursive;font-size:1rem;flex:1;}
+.proj-pct{font-family:'Fredoka One',cursive;font-size:0.88rem;color:var(--a3);flex-shrink:0;}
+.proj-mbar{height:4px;background:rgba(0,0,0,0.3);}
+.proj-mfill{height:100%;transition:width 0.5s;}
+.proj-body{display:none;padding:0 12px 12px;}
+.proj-row.open .proj-body{display:block;}
+.proj-actions{display:flex;gap:6px;margin:9px 0 7px;flex-wrap:wrap;}
+
+/* TASKS */
+.trow{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+.trow:last-child{border-bottom:none;}
+.tcb{width:21px;height:21px;border-radius:6px;border:2px solid rgba(255,255,255,0.28);
+  background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-size:0.72rem;transition:all 0.18s;}
+.tcb.done{background:var(--a3);border-color:var(--a3);}
+.tcb.paused{background:var(--a6);border-color:var(--a6);}
+.tcb.psel{background:rgba(255,149,0,0.2);border-color:var(--a6);border-style:dashed;}
+.tinfo{flex:1;min-width:0;}
+.tname{font-size:0.87rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tname.done{text-decoration:line-through;color:var(--muted);}
+.tname.paused{color:var(--a6);}
+.tsub{font-size:0.67rem;color:var(--muted);margin-top:1px;}
+.plbl{color:var(--a6);font-weight:700;background:rgba(255,149,0,0.12);border-radius:4px;padding:1px 4px;}
+.tbtn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);
+  border-radius:6px;padding:3px 7px;font-size:0.68rem;color:var(--muted);cursor:pointer;
+  transition:all 0.15s;flex-shrink:0;}
+.tbtn:hover{background:rgba(255,255,255,0.16);color:var(--txt);}
+
+/* BUTTONS */
+.btn{border:none;border-radius:var(--rs);padding:10px 17px;font-family:'Fredoka One',cursive;
+  font-size:0.95rem;cursor:pointer;transition:all 0.18s;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+.btn:active{transform:scale(0.95)!important;}
+.btn-primary{background:linear-gradient(135deg,var(--a4),#c77dff);color:#fff;box-shadow:0 3px 12px rgba(77,150,255,0.35);}
+.btn-success{background:linear-gradient(135deg,var(--a3),#4ade80);color:#fff;box-shadow:0 3px 12px rgba(107,203,119,0.35);}
+.btn-warn{background:linear-gradient(135deg,var(--a2),var(--a6));color:#1a0a00;box-shadow:0 3px 12px rgba(255,149,0,0.3);}
+.btn-danger{background:linear-gradient(135deg,var(--a1),#ff8c42);color:#fff;}
+.btn-ghost{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.18);color:var(--txt);}
+.btn-teal{background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff;box-shadow:0 3px 12px rgba(6,182,212,0.35);}
+.btn-pink{background:linear-gradient(135deg,#ec4899,#db2777);color:#fff;box-shadow:0 3px 12px rgba(236,72,153,0.35);}
+.btn-sm{padding:6px 11px;font-size:0.8rem;border-radius:8px;}
+.btn-block{width:100%;}
+
+/* AI BUILDER */
+.ai-builder{background:linear-gradient(135deg,rgba(77,150,255,0.12),rgba(199,125,255,0.08));
+  border:1px solid rgba(77,150,255,0.25);border-radius:var(--rs);padding:12px;margin-top:11px;}
+.ai-builder h4{font-family:'Fredoka One',cursive;font-size:0.93rem;color:var(--a5);margin-bottom:7px;}
+.ai-sug{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+.ai-sug:last-child{border-bottom:none;}
+.ai-sug input[type=checkbox]{accent-color:var(--a3);width:16px;height:16px;cursor:pointer;flex-shrink:0;}
+.ai-sug label{font-size:0.83rem;font-weight:600;flex:1;cursor:pointer;}
+
+/* PROGRESS GRID */
+.pgrid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.pcell{width:14px;height:14px;border-radius:3px;transition:background 0.3s;}
+.pcell.done{background:var(--a3);box-shadow:0 0 4px rgba(107,203,119,0.5);}
+.pcell.mid{background:var(--a2);}
+.pcell.low{background:var(--a6);}
+.pcell.empty{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);}
+.pbar{background:rgba(0,0,0,0.25);border-radius:99px;height:7px;overflow:hidden;border:1px solid var(--border2);margin-bottom:8px;}
+.pfill{height:100%;border-radius:99px;transition:width 0.5s;}
+
+/* WELLNESS SECTION */
+.well-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.well-card{background:rgba(0,0,0,0.2);border:1px solid var(--border2);border-radius:var(--rs);
+  padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.well-card:hover{background:rgba(255,255,255,0.08);transform:scale(1.02);}
+.well-card.done-today{border-color:var(--a3);background:rgba(107,203,119,0.1);}
+.well-icon{font-size:1.8rem;display:block;margin-bottom:5px;}
+.well-name{font-family:'Fredoka One',cursive;font-size:0.88rem;margin-bottom:2px;}
+.well-sub{font-size:0.68rem;color:var(--muted);}
+.well-check{position:absolute;top:6px;right:8px;font-size:0.85rem;}
+
+/* SUPPLEMENTS TABLE */
+.supp-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+.supp-row:last-child{border-bottom:none;}
+.supp-cb{width:21px;height:21px;border-radius:50%;border:2px solid rgba(255,255,255,0.28);background:transparent;
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.72rem;transition:all 0.18s;}
+.supp-cb.taken{background:var(--a3);border-color:var(--a3);}
+.supp-info{flex:1;}
+.supp-name{font-size:0.88rem;font-weight:700;}
+.supp-time{font-size:0.68rem;color:var(--muted);}
+.hydro-bar{background:linear-gradient(135deg,rgba(77,150,255,0.15),rgba(6,182,212,0.1));
+  border:1px solid rgba(77,150,255,0.25);border-radius:var(--rs);padding:12px;}
+.hydro-cups{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0;}
+.cup{font-size:1.3rem;cursor:pointer;transition:all 0.2s;opacity:0.35;}
+.cup.filled{opacity:1;}
+.cup:hover{transform:scale(1.15);}
+.sleep-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+.sleep-row:last-child{border-bottom:none;}
+.sleep-icon{font-size:1.3rem;flex-shrink:0;}
+.sleep-lbl{flex:1;font-size:0.88rem;font-weight:700;}
+.sleep-val{font-size:0.8rem;color:var(--a4);font-weight:700;}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat-box{background:rgba(0,0,0,0.2);border:1px solid var(--border2);border-radius:var(--rs);padding:11px;text-align:center;}
+.stat-num{font-family:'Fredoka One',cursive;font-size:1.75rem;}
+.stat-lbl{font-size:0.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;}
+
+/* WINS */
+.win-card{background:linear-gradient(135deg,rgba(107,203,119,0.12),rgba(77,150,255,0.08));
+  border:1px solid rgba(107,203,119,0.25);border-radius:var(--rs);padding:11px;margin-bottom:8px;}
+.win-title{font-family:'Fredoka One',cursive;font-size:0.93rem;color:var(--a3);margin-bottom:2px;}
+.win-desc{font-size:0.79rem;color:var(--muted);}
+
+/* SETTINGS */
+.srow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.07);}
+.srow:last-child{border-bottom:none;}
+.slbl{font-weight:700;font-size:0.88rem;}
+.ssub{font-size:0.72rem;color:var(--muted);}
+.tog{width:44px;height:23px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2);
+  border-radius:99px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
+.tog.on{background:var(--a3);border-color:var(--a3);}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;
+  border-radius:50%;background:#fff;transition:transform 0.2s;}
+.tog.on::after{transform:translateX(21px);}
+
+/* CHAT */
+.chat-wrap{height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+  padding:6px 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;}
+.msg{max-width:87%;padding:10px 12px;border-radius:13px;font-size:0.86rem;line-height:1.5;font-weight:600;}
+.msg-ai{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.12);
+  border-bottom-left-radius:3px;align-self:flex-start;}
+.msg-user{background:linear-gradient(135deg,var(--a4),#c77dff);color:#fff;
+  border-bottom-right-radius:3px;align-self:flex-end;}
+.msg-typing{color:var(--muted);font-style:italic;}
+.chat-row{display:flex;gap:6px;margin-top:8px;}
+.chat-in{flex:1;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.18);
+  border-radius:var(--rs);padding:10px 12px;color:var(--txt);font-family:'Nunito',sans-serif;
+  font-size:0.86rem;outline:none;transition:border-color 0.2s;}
+.chat-in:focus{border-color:var(--a4);}
+.chat-send{background:linear-gradient(135deg,var(--a4),#c77dff);border:none;border-radius:var(--rs);
+  padding:10px 13px;color:#fff;font-size:1.05rem;cursor:pointer;}
+.chat-mic{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.15);
+  border-radius:var(--rs);padding:10px;color:var(--txt);font-size:1.05rem;cursor:pointer;}
+.chat-mic.rec{background:var(--a1);animation:prec 1s infinite;}
+@keyframes prec{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+/* MODALS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);
+  z-index:200;display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.overlay.on{opacity:1;pointer-events:all;}
+.modal{background:linear-gradient(155deg,#3e2878 0%,#2c1a5a 100%);
+  border:1px solid rgba(255,255,255,0.17);border-radius:var(--r) var(--r) 0 0;
+  padding:20px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);}
+.overlay.on .modal{transform:translateY(0);}
+.mhandle{width:36px;height:4px;background:rgba(255,255,255,0.18);border-radius:99px;margin:0 auto 13px;}
+.mtitle{font-family:'Fredoka One',cursive;font-size:1.3rem;margin-bottom:12px;}
+
+/* FORM */
+.fg{margin-bottom:11px;}
+.flbl{font-size:0.79rem;color:var(--muted);font-weight:700;margin-bottom:4px;display:block;}
+.fin{width:100%;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.18);
+  border-radius:var(--rs);padding:10px 12px;color:var(--txt);
+  font-family:'Nunito',sans-serif;font-size:0.88rem;outline:none;transition:border-color 0.2s;}
+.fin:focus{border-color:var(--a4);}
+textarea.fin{min-height:65px;resize:vertical;}
+select.fin{cursor:pointer;}
+input[type=date].fin,input[type=time].fin,input[type=number].fin{color-scheme:dark;}
+
+/* SOS BUTTON */
+.sos{position:fixed;bottom:94px;right:15px;z-index:100;width:52px;height:52px;
+  border-radius:50%;background:linear-gradient(135deg,var(--a1),#ff8c42);border:none;
+  cursor:pointer;font-size:1.4rem;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 5px 18px rgba(255,107,107,0.55);animation:psos 2.5s infinite;}
+@keyframes psos{0%,100%{box-shadow:0 5px 18px rgba(255,107,107,0.55);}
+  50%{box-shadow:0 5px 26px rgba(255,107,107,0.85),0 0 0 6px rgba(255,107,107,0.18);}}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  background:rgba(28,14,58,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.11);
+  display:flex;justify-content:space-around;padding:7px 0 12px;z-index:100;}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 8px;flex:1;}
+.ni .ico{font-size:1.35rem;}
+.ni .lbl{font-size:0.58rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
+.ni.on .lbl{color:var(--a4);}
+.ni.on .ico{filter:drop-shadow(0 0 5px var(--a4));}
+
+/* TOAST */
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-130px);
+  background:rgba(28,14,58,0.97);border:1px solid rgba(255,255,255,0.18);border-radius:var(--r);
+  padding:11px 16px;box-shadow:var(--sh);z-index:999;max-width:300px;width:87%;
+  text-align:center;transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);font-weight:700;font-size:0.88rem;}
+.toast.on{transform:translateX(-50%) translateY(0);}
+.toast-e{font-size:1.3rem;display:block;margin-bottom:2px;}
+
+/* CONFETTI */
+@keyframes cdrop{0%{transform:translateY(-15px) rotate(0deg);opacity:1;}100%{transform:translateY(80px) rotate(360deg);opacity:0;}}
+.cp{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:9999;animation:cdrop 0.9s ease forwards;}
+
+/* SECTION LABEL */
+.sec{font-family:'Fredoka One',cursive;font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin:6px 0 3px;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:25px 12px;}
+.empty .ei{font-size:2.2rem;margin-bottom:8px;}
+.empty .et{font-family:'Fredoka One',cursive;font-size:1.1rem;margin-bottom:4px;}
+.empty .es{color:var(--muted);font-size:0.82rem;}
+
+/* DIVIDER */
+hr{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:10px 0;}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"><span class="toast-e" id="te">🎉</span><span id="tt">Great job!</span></div>
+
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Level<span>Up</span> 🚀</div>
+  <div class="badges">
+    <div class="badge badge-streak">🔥 <span id="s-streak">0</span></div>
+    <div class="badge badge-xp">⚡ <span id="s-xp">0</span> XP</div>
+  </div>
+</header>
+
+<!-- LEVEL BAR -->
+<div class="lvl-wrap">
+  <div class="lvl-top">
+    <span class="lvl-name" id="lvl-name">🌱 Seedling</span>
+    <span class="lvl-xp" id="lvl-xp">0 / 200 XP</span>
+  </div>
+  <div class="lvl-track"><div class="lvl-fill" id="lvl-fill" style="width:0%"></div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on"  onclick="go('home')">🏠 Home</div>
+  <div class="tab"     onclick="go('projects')">📋 Projects</div>
+  <div class="tab"     onclick="go('wellness')">💚 Wellness</div>
+  <div class="tab"     onclick="go('chat')">🤖 Coach</div>
+  <div class="tab"     onclick="go('wins')">🏆 Wins</div>
+  <div class="tab"     onclick="go('settings')">⚙️ Settings</div>
+</div>
+
+<!-- ═══ HOME ═══ -->
+<div id="view-home" class="view on">
+  <div id="wlo-wrap" style="display:none" class="wlo">
+    <div class="wlo-icon">📍</div>
+    <div><div class="wlo-head">Where You Left Off</div><div class="wlo-body" id="wlo-body"></div></div>
+  </div>
+
+  <!-- Daily Check-In -->
+  <div class="card">
+    <div class="card-title">☀️ Daily Check-In</div>
+    <div id="ci-done" style="display:none;text-align:center;padding:8px 0">
+      <div style="font-size:1.9rem">✅</div>
+      <div class="fredoka" style="color:var(--a3);margin-top:5px;font-size:1.05rem">Checked in today!</div>
+      <div style="color:var(--muted);font-size:0.78rem;margin-top:3px">See you for the evening wrap-up 🌙</div>
+    </div>
+    <div id="ci-flow">
+      <div class="ci-step on" id="ci-1">
+        <div class="ci-emoji">🌅</div>
+        <div class="ci-q">How are you feeling right now?</div>
+        <div class="mood-row">
+          <div class="mood-btn" onclick="pickMood(this,'🔥')"><div>🔥</div><div class="mood-label">On Fire</div></div>
+          <div class="mood-btn" onclick="pickMood(this,'😊')"><div>😊</div><div class="mood-label">Good</div></div>
+          <div class="mood-btn" onclick="pickMood(this,'😐')"><div>😐</div><div class="mood-label">Meh</div></div>
+          <div class="mood-btn" onclick="pickMood(this,'😴')"><div>😴</div><div class="mood-label">Tired</div></div>
+          <div class="mood-btn" onclick="pickMood(this,'😟')"><div>😟</div><div class="mood-label">Hard Day</div></div>
+        </div>
+      </div>
+      <div class="ci-step" id="ci-2">
+        <div class="ci-emoji">🎯</div>
+        <div class="ci-q">What's your #1 focus today?</div>
+        <textarea class="fin" id="focus-today" placeholder="e.g. Finish the proposal draft..."></textarea>
+        <br><br>
+        <button class="btn btn-primary btn-block" onclick="finishCI()">✅ Complete Check-In (+15 XP)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Tasks -->
+  <div class="card">
+    <div class="card-title">⚡ Today's Active Tasks</div>
+    <div id="home-tasks"></div>
+  </div>
+
+  <!-- Paused Tasks -->
+  <div class="card" id="paused-card" style="display:none">
+    <div class="card-title">⏸️ Paused — Coming Back</div>
+    <div id="home-paused"></div>
+  </div>
+
+  <!-- Wellness Quick View -->
+  <div class="card">
+    <div class="card-title">💚 Today's Wellness</div>
+    <div id="home-wellness"></div>
+    <button class="btn btn-teal btn-block btn-sm" onclick="go('wellness')" style="margin-top:10px">Open Wellness Hub →</button>
+  </div>
+
+  <div style="padding:0 13px 4px">
+    <button class="btn btn-success btn-block" onclick="openM('m-addproj')">＋ New Project</button>
+  </div>
+</div>
+
+<!-- ═══ PROJECTS ═══ -->
+<div id="view-projects" class="view">
+  <div style="padding:5px 13px 2px">
+    <button class="btn btn-success btn-block" onclick="openM('m-addproj')">＋ New Project</button>
+  </div>
+  <div id="proj-list" style="margin-top:4px"></div>
+</div>
+
+<!-- ═══ WELLNESS ═══ -->
+<div id="view-wellness" class="view">
+
+  <!-- Hydration -->
+  <div class="card">
+    <div class="card-title">💧 Hydration Tracker</div>
+    <div class="hydro-bar">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span class="fredoka" style="font-size:0.9rem;color:var(--a4)">Goal: <span id="hydro-goal-lbl">8</span> cups</span>
+        <span class="fredoka" style="font-size:0.9rem;color:var(--a3)"><span id="hydro-count">0</span> / <span id="hydro-goal-lbl2">8</span> today</span>
+      </div>
+      <div class="hydro-cups" id="hydro-cups"></div>
+      <div style="display:flex;gap:7px;margin-top:8px">
+        <button class="btn btn-teal btn-sm" onclick="addCup()">+ Cup</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetCups()">Reset</button>
+        <button class="btn btn-ghost btn-sm" onclick="openM('m-hydro-settings')">⚙️ Goal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercise & Rest -->
+  <div class="card">
+    <div class="card-title">🏃 Movement & Rest</div>
+    <div class="well-grid" id="move-grid"></div>
+    <button class="btn btn-ghost btn-sm btn-block" onclick="openM('m-wellness-edit')" style="margin-top:10px">⚙️ Customize Activities</button>
+  </div>
+
+  <!-- Sleep Hygiene -->
+  <div class="card">
+    <div class="card-title">🌙 Sleep Hygiene Check-In</div>
+    <div id="sleep-checkin"></div>
+    <div style="margin-top:10px;display:flex;gap:7px;align-items:center">
+      <label class="flbl" style="margin:0;flex:1">Last night's sleep:</label>
+      <select class="fin" id="sleep-hours" onchange="saveSleepHours()" style="width:auto;padding:6px 10px;">
+        <option value="">Select</option>
+        <option>4</option><option>5</option><option>6</option>
+        <option>7</option><option>8</option><option>9+</option>
+      </select>
+      <span class="fredoka" style="color:var(--a4);font-size:0.85rem">hrs</span>
+    </div>
+    <div id="sleep-feedback" style="margin-top:8px;font-size:0.8rem;color:var(--muted)"></div>
+  </div>
+
+  <!-- Supplements -->
+  <div class="card">
+    <div class="card-title">💊 Supplement Schedule</div>
+    <div id="supp-list"></div>
+    <button class="btn btn-primary btn-sm" onclick="openM('m-addsupp')" style="margin-top:10px">＋ Add Supplement</button>
+  </div>
+
+  <!-- Reminders -->
+  <div class="card">
+    <div class="card-title">🔔 Wellness Reminders</div>
+    <div id="wellness-reminders"></div>
+    <button class="btn btn-ghost btn-sm btn-block" onclick="openM('m-wellness-reminders')" style="margin-top:10px">⚙️ Edit Reminders</button>
+  </div>
+
+</div>
+
+<!-- ═══ CHAT ═══ -->
+<div id="view-chat" class="view">
+  <div class="card">
+    <div class="card-title">🤖 AI Coach</div>
+    <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px">🔒 Searches the web only — your device is never accessed.</div>
+    <div class="chat-wrap" id="chat-msgs"></div>
+    <div class="chat-row">
+      <button class="chat-mic" id="mic-btn" onclick="toggleMic()">🎤</button>
+      <input class="chat-in" id="chat-in" placeholder="Ask your coach anything..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WINS ═══ -->
+<div id="view-wins" class="view">
+  <div class="card">
+    <div class="card-title">📊 Your Stats</div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-num" style="color:var(--a3)" id="st-tasks">0</div><div class="stat-lbl">Tasks Done</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--a4)" id="st-streak">0</div><div class="stat-lbl">Day Streak</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--a2)" id="st-xp">0</div><div class="stat-lbl">Total XP</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--a5)" id="st-projs">0</div><div class="stat-lbl">Projects</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏆 Milestone Wins</div>
+    <div id="wins-list"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💜 Daily Affirmation</div>
+    <div id="affirmation" style="font-size:0.96rem;font-weight:700;line-height:1.65;text-align:center;padding:7px;color:var(--a2)"></div>
+    <button class="btn btn-ghost btn-sm btn-block" onclick="newAff()" style="margin-top:8px">🔄 New Reminder</button>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="view-settings" class="view">
+  <div class="card">
+    <div class="card-title">🔔 Notifications</div>
+    <div class="srow"><div><div class="slbl">Morning Check-In</div><div class="ssub">Daily reminder to start strong</div></div><div class="tog on" id="tog-morning" onclick="togSet(this,'morning')"></div></div>
+    <div class="srow"><div><div class="slbl">Evening Wrap-Up</div><div class="ssub">Reflect on wins at day's end</div></div><div class="tog on" id="tog-evening" onclick="togSet(this,'evening')"></div></div>
+    <div class="srow"><div><div class="slbl">Positivity Boosts</div><div class="ssub">Random encouragement</div></div><div class="tog on" id="tog-positivity" onclick="togSet(this,'positivity')"></div></div>
+    <div class="srow"><div><div class="slbl">Wellness Reminders</div><div class="ssub">Hydration, exercise, supplements</div></div><div class="tog on" id="tog-wellness" onclick="togSet(this,'wellness')"></div></div>
+    <div class="srow"><div><div class="slbl">Rest Reminders</div><div class="ssub">Scheduled breaks during the day</div></div><div class="tog on" id="tog-rest" onclick="togSet(this,'rest')"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⏰ Notification Times</div>
+    <div class="fg"><label class="flbl">Morning Check-In</label><input type="time" class="fin" id="t-morning" value="08:00"></div>
+    <div class="fg"><label class="flbl">Evening Wrap-Up</label><input type="time" class="fin" id="t-evening" value="20:00"></div>
+    <div class="fg"><label class="flbl">Rest Break Interval (hours)</label><input type="number" class="fin" id="t-rest-interval" value="2" min="1" max="6"></div>
+    <button class="btn btn-primary btn-block" onclick="saveNotifTimes()">💾 Save Times</button>
+  </div>
+  <div class="card">
+    <div class="card-title">🎮 Gamification</div>
+    <div class="srow"><div><div class="slbl">Confetti Celebrations</div><div class="ssub">Pop confetti on wins</div></div><div class="tog on" id="tog-confetti" onclick="togSet(this,'confetti')"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🗑️ Data</div>
+    <button class="btn btn-danger btn-block" onclick="resetAll()">Reset All Data</button>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<!-- SOS BUTTON -->
+<button class="sos" onclick="openSOS()" title="Overwhelmed? Tap here!">🆘</button>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <div class="ni on" onclick="go('home')" id="nav-home"><div class="ico">🏠</div><div class="lbl">Home</div></div>
+  <div class="ni" onclick="go('projects')" id="nav-projects"><div class="ico">📋</div><div class="lbl">Projects</div></div>
+  <div class="ni" onclick="go('wellness')" id="nav-wellness"><div class="ico">💚</div><div class="lbl">Wellness</div></div>
+  <div class="ni" onclick="go('chat')" id="nav-chat"><div class="ico">🤖</div><div class="lbl">Coach</div></div>
+  <div class="ni" onclick="go('wins')" id="nav-wins"><div class="ico">🏆</div><div class="lbl">Wins</div></div>
+  <div class="ni" onclick="go('settings')" id="nav-settings"><div class="ico">⚙️</div><div class="lbl">More</div></div>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add Project -->
+<div class="overlay" id="m-addproj">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">📋 New Project</div>
+    <div class="fg"><label class="flbl">Project Name *</label><input class="fin" id="pn" placeholder="e.g. Kitchen Remodel"></div>
+    <div class="fg"><label class="flbl">Description (helps AI suggest better tasks)</label><textarea class="fin" id="pd" placeholder="What is this project? More detail = smarter task list!"></textarea></div>
+    <div class="fg"><label class="flbl">Due Date (optional)</label><input type="date" class="fin" id="pdue"></div>
+    <div class="fg"><label class="flbl">Progress Grid Size (total steps)</label><input type="number" class="fin" id="psteps" value="10" min="1" max="40"></div>
+    <button class="btn btn-success btn-block" onclick="addProject()">✅ Create + Generate AI Tasks</button>
+    <div id="ai-builder" style="display:none" class="ai-builder">
+      <h4>🤖 AI-Suggested Tasks — check what you want to add</h4>
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px">Check any tasks below, then tap "Add Selected".</div>
+      <div id="ai-list"></div>
+      <div style="display:flex;gap:7px;margin-top:10px">
+        <button class="btn btn-success btn-sm" style="flex:1" onclick="addAITasks()">✅ Add Selected</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="regenAI()">🔄 Regenerate</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-addproj')" style="margin-top:9px">Cancel</button>
+  </div>
+</div>
+
+<!-- Add Task -->
+<div class="overlay" id="m-addtask">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">✏️ Add Task</div>
+    <input type="hidden" id="t-pid">
+    <div class="fg"><label class="flbl">Task Name *</label><input class="fin" id="tn" placeholder="e.g. Research contractors"></div>
+    <div class="fg"><label class="flbl">Due Date (optional)</label><input type="date" class="fin" id="tdue"></div>
+    <button class="btn btn-success btn-block" onclick="addTask()">✅ Add Task</button>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-addtask')" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<!-- Bulk Pause -->
+<div class="overlay" id="m-bulkpause">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">⏸️ Pause Selected Tasks</div>
+    <div style="color:var(--muted);font-size:0.84rem;margin-bottom:12px"><strong id="bp-n">0</strong> task(s) selected to pause.</div>
+    <div style="background:rgba(0,0,0,0.2);border-radius:var(--rs);padding:11px;margin-bottom:12px">
+      <label style="display:flex;align-items:center;gap:9px;cursor:pointer">
+        <input type="checkbox" id="use-date" onchange="toggleBPDate(this)" style="accent-color:var(--a2);width:17px;height:17px">
+        <span style="font-weight:800">Set a specific resume date</span>
+      </label>
+      <div id="bp-date-row" style="display:none;margin-top:9px">
+        <label class="flbl">Resume On</label>
+        <input type="date" class="fin" id="bp-date">
+      </div>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn btn-warn" style="flex:1" onclick="doBulkPause(false)">⏸ Till Tomorrow</button>
+      <button class="btn btn-primary" style="flex:1;display:none" id="bp-date-btn" onclick="doBulkPause(true)">📅 Till Date</button>
+    </div>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-bulkpause')" style="margin-top:9px">Cancel</button>
+  </div>
+</div>
+
+<!-- Project Detail -->
+<div class="overlay" id="m-projdetail">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div id="proj-detail-inner"></div>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-projdetail')" style="margin-top:11px">Close</button>
+  </div>
+</div>
+
+<!-- Add Supplement -->
+<div class="overlay" id="m-addsupp">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">💊 Add Supplement</div>
+    <div class="fg"><label class="flbl">Supplement Name *</label><input class="fin" id="supp-name" placeholder="e.g. Vitamin D3"></div>
+    <div class="fg"><label class="flbl">Dose (optional)</label><input class="fin" id="supp-dose" placeholder="e.g. 2000 IU"></div>
+    <div class="fg"><label class="flbl">Time of Day *</label>
+      <select class="fin" id="supp-time">
+        <option value="Morning">Morning</option>
+        <option value="Afternoon">Afternoon</option>
+        <option value="Evening">Evening</option>
+        <option value="Bedtime">Bedtime</option>
+        <option value="With meals">With meals</option>
+      </select>
+    </div>
+    <div class="fg"><label class="flbl">Days</label>
+      <select class="fin" id="supp-days">
+        <option value="Daily">Every day</option>
+        <option value="Weekdays">Weekdays only</option>
+        <option value="Weekends">Weekends only</option>
+      </select>
+    </div>
+    <button class="btn btn-success btn-block" onclick="addSupp()">✅ Add Supplement</button>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-addsupp')" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<!-- Hydration Goal -->
+<div class="overlay" id="m-hydro-settings">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">💧 Hydration Goal</div>
+    <div class="fg"><label class="flbl">Daily Water Goal (cups)</label><input type="number" class="fin" id="hydro-goal-in" value="8" min="4" max="16"></div>
+    <button class="btn btn-teal btn-block" onclick="saveHydroGoal()">💾 Save Goal</button>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-hydro-settings')" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<!-- Wellness Activities Edit -->
+<div class="overlay" id="m-wellness-edit">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">🏃 Customize Activities</div>
+    <div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px">Select which wellness activities you track daily:</div>
+    <div id="act-edit-list"></div>
+    <button class="btn btn-primary btn-block" onclick="saveActivities()" style="margin-top:11px">💾 Save</button>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-wellness-edit')" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<!-- Wellness Reminders Edit -->
+<div class="overlay" id="m-wellness-reminders">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">🔔 Wellness Reminders</div>
+    <div id="well-rem-list"></div>
+    <button class="btn btn-primary btn-block" onclick="saveWellReminders()" style="margin-top:11px">💾 Save</button>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-wellness-reminders')" style="margin-top:8px">Cancel</button>
+  </div>
+</div>
+
+<!-- SOS -->
+<div class="overlay" id="m-sos">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">🆘 Overwhelm Mode</div>
+    <div style="text-align:center;font-size:1.6rem;margin-bottom:5px">😤 → 😎</div>
+    <div style="color:var(--muted);font-size:0.82rem;margin-bottom:11px;text-align:center">Take a breath. Let's find your 1-3 focus tasks for today.</div>
+    <div class="chat-wrap" id="sos-msgs" style="height:200px"></div>
+    <div class="chat-row" style="margin-top:8px">
+      <input class="chat-in" id="sos-in" placeholder="What's overwhelming you?" onkeydown="if(event.key==='Enter')sendSOS()">
+      <button class="chat-send" onclick="sendSOS()">➤</button>
+    </div>
+    <button class="btn btn-ghost btn-block" onclick="closeM('m-sos')" style="margin-top:9px">Close</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+var KEY = 'lu4';
+
+function defState() {
+  return {
+    projects: [],
+    xp: 0,
+    streak: 0,
+    lastCheckin: null,
+    wins: [],
+    lastActivity: null,
+    settings: { morning:true, evening:true, positivity:true, wellness:true, rest:true, confetti:true },
+    notifTimes: { morning:'08:00', evening:'20:00', restInterval:2 },
+    totalTasksDone: 0,
+    supplements: [],
+    wellness: {
+      hydro: { cups: 0, goal: 8, lastReset: '' },
+      activities: [
+        { id:'exercise', name:'Exercise', icon:'🏃', enabled:true, done:false, lastDone:'' },
+        { id:'stretch',  name:'Stretch',  icon:'🧘', enabled:true, done:false, lastDone:'' },
+        { id:'walk',     name:'Walk',     icon:'🚶', enabled:true, done:false, lastDone:'' },
+        { id:'rest',     name:'Rest Break', icon:'😌', enabled:true, done:false, lastDone:'' },
+        { id:'outside',  name:'Go Outside', icon:'🌤️', enabled:false, done:false, lastDone:'' },
+        { id:'meditate', name:'Meditate',  icon:'🧠', enabled:false, done:false, lastDone:'' }
+      ],
+      sleep: { hours:'', lastDate:'', habits: [
+        { id:'noscreen', label:'No screens 1hr before bed', done:false },
+        { id:'dark',     label:'Room was dark & cool',      done:false },
+        { id:'time',     label:'Slept at a consistent time',done:false },
+        { id:'wind',     label:'Had a wind-down routine',   done:false }
+      ]},
+      wellReminders: [
+        { id:'hydro-remind',    label:'Drink water reminder',  enabled:true,  time:'10:00' },
+        { id:'posture-remind',  label:'Check your posture',    enabled:true,  time:'12:00' },
+        { id:'stretch-remind',  label:'Stretch reminder',      enabled:true,  time:'15:00' },
+        { id:'screen-remind',   label:'Eye rest (20-20-20)',   enabled:true,  time:'14:00' },
+        { id:'sleep-remind',    label:'Wind-down reminder',    enabled:true,  time:'21:00' }
+      ]
+    }
+  };
+}
+
+var S;
+try { S = JSON.parse(localStorage.getItem(KEY)); if (!S) S = defState(); } catch(e) { S = defState(); }
+
+// Fill missing wellness keys for users upgrading
+if (!S.wellness) S.wellness = defState().wellness;
+if (!S.wellness.wellReminders) S.wellness.wellReminders = defState().wellness.wellReminders;
+if (!S.supplements) S.supplements = [];
+
+function save() { localStorage.setItem(KEY, JSON.stringify(S)); }
+
+// ══════════════════════════════════════════════
+// LEVELS
+// ══════════════════════════════════════════════
+var LEVELS = [
+  {n:'🌱 Seedling',   lo:0,    hi:200},
+  {n:'🌿 Sprout',     lo:200,  hi:500},
+  {n:'⚡ Achiever',   lo:500,  hi:1000},
+  {n:'🔥 Momentum',  lo:1000, hi:2000},
+  {n:'💫 Trailblazer',lo:2000, hi:3500},
+  {n:'🏅 Champion',  lo:3500, hi:5500},
+  {n:'🚀 Legend',    lo:5500, hi:999999}
+];
+
+function getLv() {
+  for (var i = LEVELS.length - 1; i >= 0; i--) {
+    if (S.xp >= LEVELS[i].lo) return { idx:i, lv:LEVELS[i] };
+  }
+  return { idx:0, lv:LEVELS[0] };
+}
+
+function updateHUD() {
+  var r = getLv();
+  document.getElementById('lvl-name').textContent = r.lv.n;
+  document.getElementById('s-xp').textContent = S.xp;
+  document.getElementById('s-streak').textContent = S.streak;
+  var pct = Math.min(100, ((S.xp - r.lv.lo) / (r.lv.hi - r.lv.lo)) * 100);
+  document.getElementById('lvl-fill').style.width = pct + '%';
+  document.getElementById('lvl-xp').textContent = (S.xp - r.lv.lo) + ' / ' + (r.lv.hi - r.lv.lo) + ' XP';
+  document.getElementById('st-xp').textContent = S.xp;
+  document.getElementById('st-streak').textContent = S.streak;
+  document.getElementById('st-tasks').textContent = S.totalTasksDone || 0;
+  document.getElementById('st-projs').textContent = S.projects.length;
+}
+
+function gainXP(n) {
+  var oldIdx = getLv().idx;
+  S.xp += n;
+  var newIdx = getLv().idx;
+  save(); updateHUD();
+  if (newIdx > oldIdx) { toast('🎊', 'LEVEL UP! You are now ' + LEVELS[newIdx].n + '!'); confetti(); }
+}
+
+// ══════════════════════════════════════════════
+// TABS / NAV
+// ══════════════════════════════════════════════
+function go(tab) {
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) views[i].classList.remove('on');
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  var navs = document.querySelectorAll('.ni');
+  for (var i = 0; i < navs.length; i++) navs[i].classList.remove('on');
+
+  var v = document.getElementById('view-' + tab);
+  if (v) v.classList.add('on');
+  var nav = document.getElementById('nav-' + tab);
+  if (nav) nav.classList.add('on');
+  var matchTab = document.querySelector('.tab[onclick="go(\'' + tab + '\')"]');
+  if (matchTab) matchTab.classList.add('on');
+
+  if (tab === 'home')     { renderHome(); renderWLO(); }
+  if (tab === 'projects') renderProjects();
+  if (tab === 'wellness') renderWellness();
+  if (tab === 'chat')     initChat();
+  if (tab === 'wins')     renderWins();
+}
+
+// ══════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════
+function openM(id) { var el = document.getElementById(id); if (el) el.classList.add('on'); }
+function closeM(id) { var el = document.getElementById(id); if (el) el.classList.remove('on'); }
+
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('overlay')) {
+    e.target.classList.remove('on');
+  }
+});
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+var toastTimer;
+function toast(emoji, text) {
+  document.getElementById('te').textContent = emoji;
+  document.getElementById('tt').textContent = text;
+  var el = document.getElementById('toast');
+  el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.classList.remove('on'); }, 3500);
+}
+
+// ══════════════════════════════════════════════
+// CONFETTI
+// ══════════════════════════════════════════════
+function confetti() {
+  if (!S.settings.confetti) return;
+  var cols = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9500'];
+  for (var i = 0; i < 20; i++) {
+    (function(i) {
+      setTimeout(function() {
+        var p = document.createElement('div');
+        p.className = 'cp';
+        p.style.cssText = 'left:' + (10 + Math.random()*80) + 'vw;top:' + (Math.random()*30) + 'vh;background:' + cols[Math.floor(Math.random()*cols.length)] + ';animation-delay:' + (Math.random()*0.4) + 's;animation-duration:' + (0.8 + Math.random()*0.5) + 's;transform:rotate(' + (Math.random()*360) + 'deg)';
+        document.body.appendChild(p);
+        setTimeout(function() { p.remove(); }, 1400);
+      }, i * 35);
+    })(i);
+  }
+}
+
+// ══════════════════════════════════════════════
+// WHERE YOU LEFT OFF
+// ══════════════════════════════════════════════
+function setLA(projId, taskId, action, taskName, projName) {
+  S.lastActivity = { projId:projId, taskId:taskId, action:action, taskName:taskName, projName:projName, time:new Date().toISOString() };
+  save();
+}
+
+function timeSince(iso) {
+  var diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function renderWLO() {
+  var wrap = document.getElementById('wlo-wrap');
+  var body = document.getElementById('wlo-body');
+  var la = S.lastActivity;
+  if (!la) { wrap.style.display = 'none'; return; }
+
+  var proj = null;
+  for (var i = 0; i < S.projects.length; i++) {
+    if (S.projects[i].id === la.projId) { proj = S.projects[i]; break; }
+  }
+
+  var today = new Date().toISOString().split('T')[0];
+  var next = null;
+  if (proj) {
+    for (var i = 0; i < proj.tasks.length; i++) {
+      var t = proj.tasks[i];
+      if (!t.done && (!t.paused || t.pauseUntil <= today)) { next = t; break; }
+    }
+  }
+
+  var html = '';
+  if (la.action === 'done') html = 'Last completed: ';
+  else if (la.action === 'paused') html = 'Last paused: ';
+  html += '<strong style="color:var(--txt)">' + la.taskName + '</strong> in <strong>' + la.projName + '</strong>';
+  html += ' <span style="color:var(--muted);font-size:0.73rem">(' + timeSince(la.time) + ')</span>';
+  if (next) html += '<br><span style="color:var(--a4);font-weight:800">▶ Up next: ' + next.name + '</span>';
+  else if (proj) html += '<br><span style="color:var(--a3);font-weight:800">✅ All done in this project!</span>';
+
+  body.innerHTML = html;
+  wrap.style.display = 'flex';
+}
+
+// ══════════════════════════════════════════════
+// CHECK-IN
+// ══════════════════════════════════════════════
+function pickMood(el) {
+  var btns = document.querySelectorAll('.mood-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('picked');
+  el.classList.add('picked');
+  setTimeout(function() {
+    document.getElementById('ci-1').classList.remove('on');
+    document.getElementById('ci-2').classList.add('on');
+  }, 500);
+}
+
+function finishCI() {
+  var today = new Date().toISOString().split('T')[0];
+  var last = S.lastCheckin;
+  var yest = new Date(); yest.setDate(yest.getDate() - 1);
+  var ystr = yest.toISOString().split('T')[0];
+  if (!last || last === ystr) {
+    S.streak = (S.streak || 0) + 1;
+  } else if (last !== today) {
+    S.streak = 1;
+  }
+  S.lastCheckin = today;
+  save(); gainXP(15);
+  document.getElementById('ci-flow').style.display = 'none';
+  document.getElementById('ci-done').style.display = 'block';
+  toast('☀️', 'Checked in! Streak: ' + S.streak + ' 🔥 +15 XP');
+  if (S.settings.confetti) confetti();
+}
+
+// ══════════════════════════════════════════════
+// HOME RENDER
+// ══════════════════════════════════════════════
+function renderHome() {
+  var today = new Date().toISOString().split('T')[0];
+
+  // Check-in state
+  if (S.lastCheckin === today) {
+    document.getElementById('ci-flow').style.display = 'none';
+    document.getElementById('ci-done').style.display = 'block';
+  } else {
+    document.getElementById('ci-flow').style.display = 'block';
+    document.getElementById('ci-done').style.display = 'none';
+  }
+
+  // Active tasks
+  var all = [];
+  for (var i = 0; i < S.projects.length; i++) {
+    var p = S.projects[i];
+    for (var j = 0; j < p.tasks.length; j++) {
+      var t = p.tasks[j];
+      if (!t.done && (!t.paused || t.pauseUntil <= today)) {
+        all.push({ task:t, proj:p });
+      }
+    }
+  }
+
+  var ht = document.getElementById('home-tasks');
+  if (all.length === 0) {
+    ht.innerHTML = '<div class="empty"><div class="ei">📭</div><div class="et">No active tasks!</div><div class="es">Add a project to get started.</div></div>';
+  } else {
+    var html = '';
+    var show = all.slice(0, 6);
+    for (var i = 0; i < show.length; i++) {
+      var task = show[i].task, proj = show[i].proj;
+      html += '<div class="trow">';
+      html += '<div class="tcb" onclick="completeTask(' + task.id + ',' + proj.id + ')"></div>';
+      html += '<div class="tinfo"><div class="tname">' + task.name + '</div>';
+      html += '<div class="tsub">' + proj.name + (task.due ? ' · 📅 ' + task.due : '') + '</div></div>';
+      html += '<div class="tbtn" onclick="pauseTaskTom(' + task.id + ',' + proj.id + ')">⏸</div>';
+      html += '</div>';
+    }
+    if (all.length > 6) html += '<div style="text-align:center;color:var(--muted);font-size:0.77rem;padding-top:6px">+' + (all.length-6) + ' more in Projects tab</div>';
+    ht.innerHTML = html;
+  }
+
+  // Paused tasks
+  var paused = [];
+  for (var i = 0; i < S.projects.length; i++) {
+    var p = S.projects[i];
+    for (var j = 0; j < p.tasks.length; j++) {
+      var t = p.tasks[j];
+      if (t.paused && t.pauseUntil > today && !t.done) paused.push({ task:t, proj:p });
+    }
+  }
+  var pc = document.getElementById('paused-card');
+  var hp = document.getElementById('home-paused');
+  if (paused.length > 0) {
+    pc.style.display = 'block';
+    var html = '';
+    for (var i = 0; i < paused.length; i++) {
+      var task = paused[i].task, proj = paused[i].proj;
+      html += '<div class="trow">';
+      html += '<div class="tcb paused">⏸</div>';
+      html += '<div class="tinfo"><div class="tname paused">' + task.name + '</div>';
+      html += '<div class="tsub">' + proj.name + ' · <span class="plbl">Resumes ' + task.pauseUntil + '</span></div></div>';
+      html += '<div class="tbtn" onclick="unpauseTask(' + task.id + ',' + proj.id + ');renderHome()">▶</div>';
+      html += '</div>';
+    }
+    hp.innerHTML = html;
+  } else {
+    pc.style.display = 'none';
+  }
+
+  renderHomeWellness();
+}
+
+function renderHomeWellness() {
+  var today = new Date().toISOString().split('T')[0];
+  var acts = S.wellness.activities.filter(function(a) { return a.enabled; });
+  var doneCount = acts.filter(function(a) { return a.lastDone === today; }).length;
+  var cups = S.wellness.hydro.lastReset === today ? S.wellness.hydro.cups : 0;
+  var goal = S.wellness.hydro.goal || 8;
+
+  var hw = document.getElementById('home-wellness');
+  var html = '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">';
+  html += '<div style="flex:1;min-width:120px">';
+  html += '<div class="fredoka" style="color:var(--a4);font-size:0.82rem">💧 Hydration</div>';
+  html += '<div class="fredoka" style="font-size:1.4rem;color:' + (cups >= goal ? 'var(--a3)' : 'var(--a5)') + '">' + cups + '/' + goal + '</div>';
+  html += '<div style="font-size:0.7rem;color:var(--muted)">cups today</div></div>';
+  html += '<div style="flex:1;min-width:120px">';
+  html += '<div class="fredoka" style="color:var(--a3);font-size:0.82rem">🏃 Movement</div>';
+  html += '<div class="fredoka" style="font-size:1.4rem;color:' + (doneCount >= acts.length && acts.length > 0 ? 'var(--a3)' : 'var(--a5)') + '">' + doneCount + '/' + acts.length + '</div>';
+  html += '<div style="font-size:0.7rem;color:var(--muted)">activities done</div></div>';
+  var sleep = S.wellness.sleep;
+  html += '<div style="flex:1;min-width:120px">';
+  html += '<div class="fredoka" style="color:var(--a2);font-size:0.82rem">🌙 Sleep</div>';
+  html += '<div class="fredoka" style="font-size:1.4rem;color:var(--a5)">' + (sleep.lastDate === today && sleep.hours ? sleep.hours + 'hr' : '—') + '</div>';
+  html += '<div style="font-size:0.7rem;color:var(--muted)">last night</div></div>';
+  html += '</div>';
+  hw.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════════════
+var _aiProj = null, _aiTasks = [];
+
+async function addProject() {
+  var name = document.getElementById('pn').value.trim();
+  if (!name) { toast('⚠️', 'Please enter a project name!'); return; }
+  var proj = {
+    id: Date.now(),
+    name: name,
+    desc: document.getElementById('pd').value.trim(),
+    due: document.getElementById('pdue').value,
+    steps: parseInt(document.getElementById('psteps').value) || 10,
+    tasks: [],
+    created: new Date().toISOString(),
+    expanded: true
+  };
+  S.projects.push(proj); save(); gainXP(10);
+  toast('🎉', '"' + name + '" created! Generating AI tasks...');
+  document.getElementById('pn').value = '';
+  document.getElementById('pd').value = '';
+  document.getElementById('pdue').value = '';
+  document.getElementById('psteps').value = '10';
+  renderProjects();
+  await genAITasks(proj);
+}
+
+async function genAITasks(proj) {
+  var builder = document.getElementById('ai-builder');
+  var list = document.getElementById('ai-list');
+  builder.style.display = 'block';
+  list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;padding:7px 0">🤖 Generating your task list...</div>';
+  _aiProj = proj;
+
+  var prompt = 'You are a productivity expert. Generate a practical ordered task list for this project.\n\nProject: "' + proj.name + '"\nDescription: "' + (proj.desc || 'No description') + '"\n\nCreate 6-10 specific actionable tasks from start to finish. Respond ONLY with a JSON array of strings. No markdown, no explanation. Example: ["Task one","Task two","Task three"]';
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 600, messages: [{ role: 'user', content: prompt }] })
+    });
+    var data = await res.json();
+    var raw = '';
+    for (var i = 0; i < data.content.length; i++) {
+      if (data.content[i].type === 'text') raw += data.content[i].text;
+    }
+    raw = raw.replace(/```json|```/g, '').trim();
+    _aiTasks = JSON.parse(raw);
+  } catch(e) {
+    _aiTasks = ['Define project goals','Research requirements','Create action plan','Execute first phase','Review progress','Final review & wrap-up'];
+  }
+  renderAIList();
+}
+
+function renderAIList() {
+  var html = '';
+  for (var i = 0; i < _aiTasks.length; i++) {
+    html += '<div class="ai-sug">';
+    html += '<input type="checkbox" id="ai' + i + '" checked>';
+    html += '<label for="ai' + i + '">' + _aiTasks[i] + '</label>';
+    html += '</div>';
+  }
+  document.getElementById('ai-list').innerHTML = html;
+}
+
+function addAITasks() {
+  if (!_aiProj) return;
+  var proj = null;
+  for (var i = 0; i < S.projects.length; i++) {
+    if (S.projects[i].id === _aiProj.id) { proj = S.projects[i]; break; }
+  }
+  if (!proj) return;
+  var added = 0;
+  for (var i = 0; i < _aiTasks.length; i++) {
+    var cb = document.getElementById('ai' + i);
+    if (cb && cb.checked) {
+      proj.tasks.push({ id: Date.now() + i, name: _aiTasks[i], due: '', done: false, paused: false, pauseUntil: null, created: new Date().toISOString(), completedAt: null });
+      added++;
+    }
+  }
+  save(); document.getElementById('ai-builder').style.display = 'none';
+  closeM('m-addproj'); renderProjects(); renderHome();
+  gainXP(added * 3); toast('🤖', 'Added ' + added + ' AI tasks! +' + (added*3) + ' XP');
+}
+
+async function regenAI() { if (_aiProj) await genAITasks(_aiProj); }
+
+function getPct(proj) {
+  if (!proj.tasks.length) return 0;
+  return Math.round(proj.tasks.filter(function(t) { return t.done; }).length / proj.tasks.length * 100);
+}
+
+function barColor(pct) {
+  if (pct >= 100) return 'linear-gradient(90deg,#6bcb77,#4ade80)';
+  if (pct >= 75)  return 'linear-gradient(90deg,#6bcb77,#ffd93d)';
+  if (pct >= 50)  return 'linear-gradient(90deg,#ffd93d,#ff9500)';
+  if (pct >= 25)  return 'linear-gradient(90deg,#ff9500,#ff6b6b)';
+  return 'linear-gradient(90deg,#ff4444,#ff6b6b)';
+}
+
+function pgridHTML(proj) {
+  var pct = getPct(proj);
+  var total = Math.min(proj.steps || 10, 30);
+  var filled = Math.round(pct / 100 * total);
+  var html = '<div class="pgrid">';
+  for (var i = 0; i < total; i++) {
+    var cls = 'empty';
+    if (i < filled) {
+      cls = pct >= 100 ? 'done' : (i < filled * 0.5 ? 'low' : i < filled * 0.8 ? 'mid' : 'done');
+    }
+    html += '<div class="pcell ' + cls + '"></div>';
+  }
+  return html + '</div>';
+}
+
+function renderProjects() {
+  var el = document.getElementById('proj-list');
+  if (!S.projects.length) {
+    el.innerHTML = '<div class="empty"><div class="ei">🗂️</div><div class="et">No projects yet!</div><div class="es">Tap "+ New Project" to begin.</div></div>';
+    return;
+  }
+  var today = new Date().toISOString().split('T')[0];
+  var html = '';
+  for (var pi = 0; pi < S.projects.length; pi++) {
+    var proj = S.projects[pi];
+    var pct = getPct(proj);
+    var ac = proj.tasks.filter(function(t) { return !t.done && (!t.paused || t.pauseUntil <= today); }).length;
+    var dc = proj.tasks.filter(function(t) { return t.done; }).length;
+    var pc = proj.tasks.filter(function(t) { return t.paused && t.pauseUntil > today && !t.done; }).length;
+    var open = proj.expanded !== false;
+    html += '<div class="proj-row ' + (open ? 'open' : '') + '" id="pr-' + proj.id + '">';
+    html += '<div class="proj-hdr" onclick="toggleProj(' + proj.id + ')">';
+    html += '<span class="proj-arr">▶</span>';
+    html += '<span class="proj-name">' + proj.name + '</span>';
+    html += '<span style="font-size:0.7rem;color:var(--muted);margin-right:5px">' + ac + ' active · ' + dc + '✓' + (pc ? ' · ' + pc + '⏸' : '') + '</span>';
+    html += '<span class="proj-pct">' + pct + '%</span></div>';
+    html += '<div class="proj-mbar"><div class="proj-mfill" style="width:' + pct + '%;background:' + barColor(pct) + '"></div></div>';
+    html += '<div class="proj-body">';
+    html += pgridHTML(proj);
+    html += '<div class="pbar"><div class="pfill" style="width:' + pct + '%;background:' + barColor(pct) + '"></div></div>';
+    html += '<div class="proj-actions">';
+    html += '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAddTask(' + proj.id + ')">＋ Task</button>';
+    html += '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openAIForProj(' + proj.id + ')">🤖 AI Tasks</button>';
+    html += '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openDetail(' + proj.id + ')">📋 Detail</button>';
+    html += '<button class="btn btn-warn btn-sm" id="pab-' + proj.id + '" style="display:none" onclick="event.stopPropagation();openBulkPause(' + proj.id + ')">⏸ Pause Sel.</button>';
+    html += '</div>';
+    html += '<div id="ptasks-' + proj.id + '">' + renderTasksInline(proj) + '</div>';
+    html += '</div></div>';
+  }
+  el.innerHTML = html;
+}
+
+function renderTasksInline(proj) {
+  var today = new Date().toISOString().split('T')[0];
+  if (!proj.tasks.length) return '<div style="color:var(--muted);font-size:0.79rem;padding:5px 0">No tasks yet — add one above or use 🤖 AI Tasks!</div>';
+
+  var active = proj.tasks.filter(function(t) { return !t.done && (!t.paused || t.pauseUntil <= today); });
+  var paused = proj.tasks.filter(function(t) { return t.paused && t.pauseUntil > today && !t.done; });
+  var done   = proj.tasks.filter(function(t) { return t.done; });
+
+  function taskRow(task) {
+    var isDone = task.done, isPaused = task.paused && !isDone;
+    var cbCls = isDone ? 'done' : isPaused ? 'paused' : '';
+    var nmCls = isDone ? 'done' : isPaused ? 'paused' : '';
+    var html = '<div class="trow" id="tr-' + task.id + '">';
+    html += '<div class="tcb ' + cbCls + '" onclick="handleCb(' + task.id + ',' + proj.id + ')">' + (isDone ? '✓' : isPaused ? '⏸' : '') + '</div>';
+    if (!isDone && !isPaused) {
+      html += '<input type="checkbox" style="display:none" class="psel" id="pscb-' + task.id + '" data-proj="' + proj.id + '" onchange="updPauseCount(' + proj.id + ')">';
+    }
+    html += '<div class="tinfo"><div class="tname ' + nmCls + '">' + task.name + '</div>';
+    html += '<div class="tsub">' + (task.due ? '📅 ' + task.due + ' · ' : '') + (isPaused ? '<span class="plbl">Resumes ' + task.pauseUntil + '</span>' : '') + '</div></div>';
+    if (!isDone && !isPaused) html += '<div class="tbtn" onclick="selPause(' + task.id + ',' + proj.id + ')">⏸</div>';
+    if (isPaused)  html += '<div class="tbtn" onclick="unpauseTask(' + task.id + ',' + proj.id + ')">▶</div>';
+    if (isDone)    html += '<div class="tbtn" onclick="reopenTask(' + task.id + ',' + proj.id + ')">↩️</div>';
+    html += '</div>';
+    return html;
+  }
+
+  var html = '';
+  if (active.length) { html += '<div class="sec">Active</div>'; for (var i = 0; i < active.length; i++) html += taskRow(active[i]); }
+  if (paused.length) { html += '<div class="sec" style="margin-top:6px">⏸ Paused</div>'; for (var i = 0; i < paused.length; i++) html += taskRow(paused[i]); }
+  if (done.length)   { html += '<div class="sec" style="margin-top:6px">✅ Done</div>'; for (var i = 0; i < done.length; i++) html += taskRow(done[i]); }
+  return html;
+}
+
+function handleCb(taskId, projId) {
+  var proj = findProj(projId), task = findTask(proj, taskId);
+  if (!task || task.done) return;
+  if (task.paused) { unpauseTask(taskId, projId); return; }
+  completeTask(taskId, projId);
+}
+
+function selPause(taskId, projId) {
+  var cb = document.getElementById('pscb-' + taskId);
+  if (!cb) return;
+  cb.checked = !cb.checked;
+  var cbEl = document.querySelector('#tr-' + taskId + ' .tcb');
+  if (cbEl) cbEl.classList.toggle('psel', cb.checked);
+  updPauseCount(projId);
+}
+
+function updPauseCount(projId) {
+  var sels = document.querySelectorAll('.psel[data-proj="' + projId + '"]:checked');
+  var btn = document.getElementById('pab-' + projId);
+  if (btn) btn.style.display = sels.length > 0 ? 'inline-flex' : 'none';
+}
+
+var _bpCtx = null;
+function openBulkPause(projId) {
+  var sels = document.querySelectorAll('.psel[data-proj="' + projId + '"]:checked');
+  var ids = [];
+  for (var i = 0; i < sels.length; i++) ids.push(parseInt(sels[i].id.replace('pscb-', '')));
+  if (!ids.length) { toast('⚠️', 'Select tasks to pause first'); return; }
+  document.getElementById('bp-n').textContent = ids.length;
+  document.getElementById('use-date').checked = false;
+  document.getElementById('bp-date-row').style.display = 'none';
+  document.getElementById('bp-date-btn').style.display = 'none';
+  var t = new Date(); t.setDate(t.getDate() + 1);
+  document.getElementById('bp-date').value = t.toISOString().split('T')[0];
+  _bpCtx = { projId: projId, ids: ids };
+  openM('m-bulkpause');
+}
+
+function toggleBPDate(cb) {
+  document.getElementById('bp-date-row').style.display = cb.checked ? 'block' : 'none';
+  document.getElementById('bp-date-btn').style.display = cb.checked ? 'inline-flex' : 'none';
+}
+
+function doBulkPause(useDate) {
+  if (!_bpCtx) return;
+  var proj = findProj(_bpCtx.projId);
+  if (!proj) return;
+  var date;
+  if (useDate) {
+    date = document.getElementById('bp-date').value;
+    if (!date) { toast('⚠️', 'Please pick a date'); return; }
+  } else {
+    var t = new Date(); t.setDate(t.getDate() + 1);
+    date = t.toISOString().split('T')[0];
+  }
+  for (var i = 0; i < _bpCtx.ids.length; i++) {
+    var task = findTask(proj, _bpCtx.ids[i]);
+    if (task) { task.paused = true; task.pauseUntil = date; }
+  }
+  save(); closeM('m-bulkpause'); refreshProjRow(_bpCtx.projId); renderHome();
+  toast('⏸️', _bpCtx.ids.length + ' task(s) paused until ' + date);
+}
+
+function toggleProj(projId) {
+  var proj = findProj(projId); if (!proj) return;
+  proj.expanded = !proj.expanded; save();
+  var row = document.getElementById('pr-' + projId);
+  if (row) row.classList.toggle('open', proj.expanded);
+}
+
+function refreshProjRow(projId) {
+  var proj = findProj(projId); if (!proj) return;
+  var el = document.getElementById('ptasks-' + projId);
+  if (el) el.innerHTML = renderTasksInline(proj);
+  updPauseCount(projId);
+  var pct = getPct(proj);
+  var pctEl = document.querySelector('#pr-' + projId + ' .proj-pct');
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+function openAddTask(projId) {
+  document.getElementById('t-pid').value = projId;
+  openM('m-addtask');
+}
+
+function addTask() {
+  var name = document.getElementById('tn').value.trim();
+  var projId = parseInt(document.getElementById('t-pid').value);
+  if (!name) { toast('⚠️', 'Please enter a task name!'); return; }
+  var proj = findProj(projId); if (!proj) return;
+  proj.tasks.push({ id:Date.now(), name:name, due:document.getElementById('tdue').value, done:false, paused:false, pauseUntil:null, created:new Date().toISOString(), completedAt:null });
+  save(); closeM('m-addtask');
+  document.getElementById('tn').value = ''; document.getElementById('tdue').value = '';
+  refreshProjRow(projId); renderHome(); gainXP(5);
+}
+
+function completeTask(taskId, projId) {
+  var proj = findProj(projId), task = findTask(proj, taskId);
+  if (!task || task.done) return;
+  task.done = true; task.paused = false; task.completedAt = new Date().toISOString();
+  S.totalTasksDone = (S.totalTasksDone || 0) + 1;
+  setLA(projId, taskId, 'done', task.name, proj.name);
+  save(); gainXP(20);
+  toast('⚡', 'Task done! +20 XP 🎉');
+  if (S.settings.confetti) confetti();
+  checkMilestone(proj); refreshProjRow(projId); renderHome();
+}
+
+function reopenTask(taskId, projId) {
+  var proj = findProj(projId), task = findTask(proj, taskId);
+  if (!task) return;
+  task.done = false; task.completedAt = null;
+  save(); refreshProjRow(projId); renderHome();
+  toast('↩️', 'Task reopened — new area added!');
+}
+
+function unpauseTask(taskId, projId) {
+  var proj = findProj(projId), task = findTask(proj, taskId);
+  if (!task) return;
+  task.paused = false; task.pauseUntil = null;
+  save(); refreshProjRow(projId); renderHome();
+  toast('▶️', 'Task unpaused!');
+}
+
+function pauseTaskTom(taskId, projId) {
+  var proj = findProj(projId), task = findTask(proj, taskId);
+  if (!task) return;
+  var t = new Date(); t.setDate(t.getDate() + 1);
+  task.paused = true; task.pauseUntil = t.toISOString().split('T')[0];
+  setLA(projId, taskId, 'paused', task.name, proj.name);
+  save(); refreshProjRow(projId); renderHome();
+  toast('⏸️', 'Paused until tomorrow!');
+}
+
+function checkMilestone(proj) {
+  var pct = getPct(proj);
+  var milestones = [25, 50, 75, 100];
+  for (var i = 0; i < milestones.length; i++) {
+    var m = milestones[i];
+    var key = proj.id + '-' + m;
+    var already = false;
+    for (var j = 0; j < (S.wins || []).length; j++) { if (S.wins[j].key === key) { already = true; break; } }
+    if (pct >= m && !already) {
+      var win = { key:key, title: pct===100 ? '🎊 "' + proj.name + '" Complete!' : '🏅 "' + proj.name + '" ' + m + '% Done!', desc: pct===100 ? 'Incredible work! Project finished!' : 'Keep that momentum going!', date: new Date().toLocaleDateString(), xp: m===100 ? 100 : 30 };
+      if (!S.wins) S.wins = [];
+      S.wins.unshift(win); gainXP(win.xp); save();
+      toast(pct===100 ? '🏆' : '🥇', win.title);
+      if (pct === 100) { confetti(); setTimeout(confetti, 400); }
+    }
+  }
+}
+
+function openDetail(projId) {
+  var proj = findProj(projId); if (!proj) return;
+  var pct = getPct(proj);
+  var today = new Date().toISOString().split('T')[0];
+  var html = '<div style="font-family:\'Fredoka One\',cursive;font-size:1.25rem;margin-bottom:10px">' + proj.name + '</div>';
+  if (proj.desc) html += '<div style="color:var(--muted);font-size:0.83rem;margin-bottom:9px">' + proj.desc + '</div>';
+  html += '<div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-family:\'Fredoka One\',cursive;font-size:1.5rem;color:var(--a3)">' + pct + '%</span><span style="font-size:0.77rem;color:var(--muted)">' + proj.tasks.filter(function(t){return t.done;}).length + '/' + proj.tasks.length + ' done</span></div>';
+  html += pgridHTML(proj);
+  html += '<div class="pbar"><div class="pfill" style="width:' + pct + '%;background:' + barColor(pct) + '"></div></div>';
+  html += '<div style="display:flex;gap:7px;margin-bottom:12px">';
+  html += '<button class="btn btn-primary btn-sm" onclick="openAddTask(' + proj.id + ');closeM(\'m-projdetail\')">＋ Task</button>';
+  html += '<button class="btn btn-ghost btn-sm" onclick="openAIForProj(' + proj.id + ');closeM(\'m-projdetail\')">🤖 AI Tasks</button>';
+  html += '</div>';
+  html += renderTasksInline(proj);
+  document.getElementById('proj-detail-inner').innerHTML = html;
+  openM('m-projdetail');
+}
+
+async function openAIForProj(projId) {
+  var proj = findProj(projId); if (!proj) return;
+  document.getElementById('pn').value = proj.name;
+  document.getElementById('pd').value = proj.desc || '';
+  openM('m-addproj');
+  await genAITasks(proj);
+}
+
+function findProj(id) { for (var i = 0; i < S.projects.length; i++) { if (S.projects[i].id === id) return S.projects[i]; } return null; }
+function findTask(proj, id) { if (!proj) return null; for (var i = 0; i < proj.tasks.length; i++) { if (proj.tasks[i].id === id) return proj.tasks[i]; } return null; }
+
+// ══════════════════════════════════════════════
+// WELLNESS
+// ══════════════════════════════════════════════
+function resetDailyWellness() {
+  var today = new Date().toISOString().split('T')[0];
+  // Reset hydration cups if new day
+  if (S.wellness.hydro.lastReset !== today) {
+    S.wellness.hydro.cups = 0;
+    S.wellness.hydro.lastReset = today;
+  }
+  // Reset activity done flags if new day
+  for (var i = 0; i < S.wellness.activities.length; i++) {
+    var act = S.wellness.activities[i];
+    if (act.lastDone !== today) act.done = false;
+  }
+  // Reset sleep habits if new day
+  if (S.wellness.sleep.lastDate !== today) {
+    for (var i = 0; i < S.wellness.sleep.habits.length; i++) {
+      S.wellness.sleep.habits[i].done = false;
+    }
+  }
+  save();
+}
+
+function renderWellness() {
+  resetDailyWellness();
+  renderHydro();
+  renderActivities();
+  renderSleep();
+  renderSupps();
+  renderWellReminders();
+}
+
+// HYDRATION
+function renderHydro() {
+  var today = new Date().toISOString().split('T')[0];
+  var cups = S.wellness.hydro.lastReset === today ? S.wellness.hydro.cups : 0;
+  var goal = S.wellness.hydro.goal || 8;
+  document.getElementById('hydro-count').textContent = cups;
+  document.getElementById('hydro-goal-lbl').textContent = goal;
+  document.getElementById('hydro-goal-lbl2').textContent = goal;
+  document.getElementById('hydro-goal-in').value = goal;
+  var html = '';
+  for (var i = 0; i < goal; i++) {
+    html += '<div class="cup ' + (i < cups ? 'filled' : '') + '" onclick="setCups(' + (i+1) + ')">💧</div>';
+  }
+  document.getElementById('hydro-cups').innerHTML = html;
+}
+
+function addCup() {
+  var today = new Date().toISOString().split('T')[0];
+  if (S.wellness.hydro.lastReset !== today) { S.wellness.hydro.cups = 0; S.wellness.hydro.lastReset = today; }
+  var goal = S.wellness.hydro.goal || 8;
+  if (S.wellness.hydro.cups < goal) {
+    S.wellness.hydro.cups++;
+    save(); renderHydro(); renderHomeWellness();
+    if (S.wellness.hydro.cups === goal) { toast('💧', 'Hydration goal reached! Great job! 🎉'); gainXP(10); confetti(); }
+    else toast('💧', S.wellness.hydro.cups + ' / ' + goal + ' cups today!');
+  } else {
+    toast('✅', 'Hydration goal already reached! Amazing!');
+  }
+}
+
+function setCups(n) {
+  var today = new Date().toISOString().split('T')[0];
+  if (S.wellness.hydro.lastReset !== today) { S.wellness.hydro.cups = 0; S.wellness.hydro.lastReset = today; }
+  S.wellness.hydro.cups = n; save(); renderHydro(); renderHomeWellness();
+  var goal = S.wellness.hydro.goal || 8;
+  if (n >= goal) { toast('💧', 'Hydration goal reached! +10 XP 🎉'); gainXP(10); }
+}
+
+function resetCups() {
+  var today = new Date().toISOString().split('T')[0];
+  S.wellness.hydro.cups = 0; S.wellness.hydro.lastReset = today;
+  save(); renderHydro(); renderHomeWellness();
+  toast('💧', 'Hydration reset for today.');
+}
+
+function saveHydroGoal() {
+  var g = parseInt(document.getElementById('hydro-goal-in').value) || 8;
+  S.wellness.hydro.goal = Math.max(4, Math.min(16, g));
+  save(); closeM('m-hydro-settings'); renderHydro();
+  toast('💧', 'Hydration goal set to ' + S.wellness.hydro.goal + ' cups!');
+}
+
+// ACTIVITIES
+function renderActivities() {
+  var today = new Date().toISOString().split('T')[0];
+  var acts = S.wellness.activities.filter(function(a) { return a.enabled; });
+  var html = '';
+  if (!acts.length) {
+    html = '<div style="color:var(--muted);font-size:0.83rem;text-align:center;padding:10px 0">No activities selected. Tap "Customize Activities".</div>';
+  } else {
+    for (var i = 0; i < acts.length; i++) {
+      var a = acts[i];
+      var doneToday = a.lastDone === today;
+      html += '<div class="well-card ' + (doneToday ? 'done-today' : '') + '" onclick="toggleAct(\'' + a.id + '\')">';
+      html += '<span class="well-icon">' + a.icon + '</span>';
+      html += '<div class="well-name">' + a.name + '</div>';
+      html += '<div class="well-sub">' + (doneToday ? '✅ Done today!' : 'Tap to mark done') + '</div>';
+      if (doneToday) html += '<div class="well-check">✅</div>';
+      html += '</div>';
+    }
+  }
+  document.getElementById('move-grid').innerHTML = html;
+
+  // Edit list in modal
+  var editHtml = '';
+  for (var i = 0; i < S.wellness.activities.length; i++) {
+    var a = S.wellness.activities[i];
+    editHtml += '<div class="trow">';
+    editHtml += '<span style="font-size:1.4rem;width:28px">' + a.icon + '</span>';
+    editHtml += '<div class="tinfo"><div class="tname">' + a.name + '</div></div>';
+    editHtml += '<input type="checkbox" id="act-' + a.id + '" ' + (a.enabled ? 'checked' : '') + ' style="accent-color:var(--a3);width:18px;height:18px;cursor:pointer">';
+    editHtml += '</div>';
+  }
+  document.getElementById('act-edit-list').innerHTML = editHtml;
+}
+
+function toggleAct(actId) {
+  var today = new Date().toISOString().split('T')[0];
+  for (var i = 0; i < S.wellness.activities.length; i++) {
+    if (S.wellness.activities[i].id === actId) {
+      var a = S.wellness.activities[i];
+      if (a.lastDone === today) {
+        a.lastDone = ''; a.done = false;
+        toast(a.icon, a.name + ' unmarked.');
+      } else {
+        a.lastDone = today; a.done = true;
+        toast(a.icon, a.name + ' done! +5 XP 💪'); gainXP(5);
+        if (S.settings.confetti) confetti();
+      }
+      break;
+    }
+  }
+  save(); renderActivities(); renderHomeWellness();
+}
+
+function saveActivities() {
+  for (var i = 0; i < S.wellness.activities.length; i++) {
+    var cb = document.getElementById('act-' + S.wellness.activities[i].id);
+    if (cb) S.wellness.activities[i].enabled = cb.checked;
+  }
+  save(); closeM('m-wellness-edit'); renderActivities();
+  toast('✅', 'Activities saved!');
+}
+
+// SLEEP
+function renderSleep() {
+  var today = new Date().toISOString().split('T')[0];
+  var habits = S.wellness.sleep.habits;
+  var html = '';
+  for (var i = 0; i < habits.length; i++) {
+    var h = habits[i];
+    html += '<div class="sleep-row">';
+    html += '<div class="sleep-icon">' + (h.done ? '✅' : '⬜') + '</div>';
+    html += '<div class="sleep-lbl">' + h.label + '</div>';
+    var sleepIdx = i; // closure fix
+    html += '<div class="tbtn" onclick="toggleSleepHabit(' + i + ')">' + (h.done ? 'Undo' : 'Done') + '</div>';
+    html += '</div>';
+  }
+  document.getElementById('sleep-checkin').innerHTML = html;
+
+  // Sleep hours
+  var hrs = (S.wellness.sleep.lastDate === today) ? S.wellness.sleep.hours : '';
+  document.getElementById('sleep-hours').value = hrs;
+
+  var feedback = '';
+  if (hrs) {
+    var n = parseInt(hrs);
+    if (hrs === '9+' || n >= 8) feedback = '😴 Great sleep! You gave your body what it needs.';
+    else if (n === 7) feedback = '🙂 Good sleep! Aim for 7-9 hours consistently.';
+    else if (n === 6) feedback = '⚠️ A bit short. Try to get to bed 30 min earlier tonight.';
+    else feedback = '😟 Not enough rest. Your body and mind need sleep to perform. Prioritize it tonight!';
+  }
+  document.getElementById('sleep-feedback').textContent = feedback;
+}
+
+function toggleSleepHabit(idx) {
+  var today = new Date().toISOString().split('T')[0];
+  if (S.wellness.sleep.lastDate !== today) {
+    for (var i = 0; i < S.wellness.sleep.habits.length; i++) S.wellness.sleep.habits[i].done = false;
+    S.wellness.sleep.lastDate = today;
+  }
+  S.wellness.sleep.habits[idx].done = !S.wellness.sleep.habits[idx].done;
+  save(); renderSleep();
+  if (S.wellness.sleep.habits[idx].done) { gainXP(3); toast('🌙', 'Sleep habit checked! +3 XP'); }
+}
+
+function saveSleepHours() {
+  var today = new Date().toISOString().split('T')[0];
+  S.wellness.sleep.hours = document.getElementById('sleep-hours').value;
+  S.wellness.sleep.lastDate = today;
+  save(); renderSleep(); renderHomeWellness();
+  toast('🌙', 'Sleep logged!');
+}
+
+// SUPPLEMENTS
+function renderSupps() {
+  var today = new Date().toISOString().split('T')[0];
+  var el = document.getElementById('supp-list');
+  if (!S.supplements || !S.supplements.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;padding:5px 0">No supplements added yet. Tap the button below to add your first!</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < S.supplements.length; i++) {
+    var s = S.supplements[i];
+    var taken = s.lastTaken === today;
+    html += '<div class="supp-row">';
+    html += '<div class="supp-cb ' + (taken ? 'taken' : '') + '" onclick="toggleSupp(' + i + ')">' + (taken ? '✓' : '') + '</div>';
+    html += '<div class="supp-info"><div class="supp-name">💊 ' + s.name + (s.dose ? ' — ' + s.dose : '') + '</div>';
+    html += '<div class="supp-time">⏰ ' + s.time + ' · ' + s.days + '</div></div>';
+    html += '<div class="tbtn" onclick="deleteSupp(' + i + ')">🗑️</div>';
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function addSupp() {
+  var name = document.getElementById('supp-name').value.trim();
+  if (!name) { toast('⚠️', 'Please enter a supplement name!'); return; }
+  if (!S.supplements) S.supplements = [];
+  S.supplements.push({ name:name, dose:document.getElementById('supp-dose').value.trim(), time:document.getElementById('supp-time').value, days:document.getElementById('supp-days').value, lastTaken:'' });
+  save(); closeM('m-addsupp');
+  document.getElementById('supp-name').value = '';
+  document.getElementById('supp-dose').value = '';
+  renderSupps();
+  toast('💊', name + ' added to your supplement schedule!');
+}
+
+function toggleSupp(idx) {
+  var today = new Date().toISOString().split('T')[0];
+  var s = S.supplements[idx];
+  if (s.lastTaken === today) {
+    s.lastTaken = '';
+    toast('💊', s.name + ' unmarked.');
+  } else {
+    s.lastTaken = today;
+    gainXP(5); toast('💊', s.name + ' taken! +5 XP ✅');
+  }
+  save(); renderSupps();
+}
+
+function deleteSupp(idx) {
+  if (confirm('Remove ' + S.supplements[idx].name + '?')) {
+    S.supplements.splice(idx, 1); save(); renderSupps();
+    toast('🗑️', 'Supplement removed.');
+  }
+}
+
+// WELLNESS REMINDERS
+function renderWellReminders() {
+  var today = new Date().toISOString().split('T')[0];
+  var rems = S.wellness.wellReminders;
+  var html = '';
+  for (var i = 0; i < rems.length; i++) {
+    var r = rems[i];
+    html += '<div class="srow">';
+    html += '<div><div class="slbl">' + r.label + '</div><div class="ssub">' + (r.enabled ? '⏰ ' + r.time : 'Disabled') + '</div></div>';
+    html += '<div class="tog ' + (r.enabled ? 'on' : '') + '" onclick="quickToggleWellRem(' + i + ')"></div>';
+    html += '</div>';
+  }
+  document.getElementById('wellness-reminders').innerHTML = html || '<div style="color:var(--muted);font-size:0.82rem">No reminders configured.</div>';
+
+  // Edit modal
+  var editHtml = '';
+  for (var i = 0; i < rems.length; i++) {
+    var r = rems[i];
+    editHtml += '<div class="trow" style="flex-wrap:wrap;gap:8px;">';
+    editHtml += '<div class="tinfo"><div class="tname">' + r.label + '</div></div>';
+    editHtml += '<input type="time" class="fin" id="wrt-' + i + '" value="' + r.time + '" style="width:110px;padding:5px 8px;">';
+    editHtml += '<div class="tog ' + (r.enabled ? 'on' : '') + '" id="wrtog-' + i + '" onclick="this.classList.toggle(\'on\')"></div>';
+    editHtml += '</div>';
+  }
+  document.getElementById('well-rem-list').innerHTML = editHtml;
+}
+
+function quickToggleWellRem(idx) {
+  S.wellness.wellReminders[idx].enabled = !S.wellness.wellReminders[idx].enabled;
+  save(); renderWellReminders();
+}
+
+function saveWellReminders() {
+  for (var i = 0; i < S.wellness.wellReminders.length; i++) {
+    var t = document.getElementById('wrt-' + i);
+    var tog = document.getElementById('wrtog-' + i);
+    if (t) S.wellness.wellReminders[i].time = t.value;
+    if (tog) S.wellness.wellReminders[i].enabled = tog.classList.contains('on');
+  }
+  save(); closeM('m-wellness-reminders'); renderWellReminders();
+  toast('✅', 'Wellness reminders saved!');
+}
+
+// ══════════════════════════════════════════════
+// AI CHAT
+// ══════════════════════════════════════════════
+var chatH = [], chatReady = false;
+
+function initChat() {
+  if (chatReady) return;
+  chatReady = true;
+  var ac = [];
+  for (var i = 0; i < S.projects.length; i++) {
+    var p = S.projects[i];
+    var next = null;
+    for (var j = 0; j < p.tasks.length; j++) {
+      if (!p.tasks[j].done && !p.tasks[j].paused) { next = p.tasks[j]; break; }
+    }
+    if (next) ac.push('"' + p.name + '"(' + getPct(p) + '%)');
+  }
+  addMsg('ai', 'Hey! 👋 I\'m your LevelUp coach!\n\nYou\'re on a **' + S.streak + '-day streak** with **' + S.xp + ' XP**! 🔥\n\nActive projects: ' + (ac.join(', ') || 'none yet') + '.\n\nI can search the web to solve blockers, help you prioritize, coach your mindset, or just cheer you on! 💪\n\n🔒 Web search only — your device files are never accessed.');
+}
+
+function addMsg(role, text) {
+  var c = document.getElementById('chat-msgs');
+  var d = document.createElement('div');
+  d.className = 'msg msg-' + role;
+  d.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+  if (role === 'user') chatH.push({ role:'user', content:text });
+}
+
+function showTyping() {
+  var c = document.getElementById('chat-msgs');
+  var d = document.createElement('div'); d.className = 'msg msg-ai msg-typing'; d.id = 'typi'; d.textContent = '✨ Thinking...';
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function removeTyping() { var el = document.getElementById('typi'); if (el) el.remove(); }
+
+async function sendChat() {
+  var inp = document.getElementById('chat-in');
+  var text = inp.value.trim(); if (!text) return;
+  inp.value = ''; addMsg('user', text); showTyping();
+
+  var projSummary = '';
+  for (var i = 0; i < S.projects.length; i++) {
+    var p = S.projects[i];
+    var next = null;
+    for (var j = 0; j < p.tasks.length; j++) { if (!p.tasks[j].done && !p.tasks[j].paused) { next = p.tasks[j]; break; } }
+    projSummary += p.name + '(' + getPct(p) + '%,next:' + (next ? next.name : 'all done') + ') ';
+  }
+  var today = new Date().toISOString().split('T')[0];
+  var cups = S.wellness.hydro.lastReset === today ? S.wellness.hydro.cups : 0;
+  var wellSummary = 'Hydration: ' + cups + '/' + (S.wellness.hydro.goal||8) + ' cups. Sleep last night: ' + (S.wellness.sleep.hours || 'not logged') + ' hrs.';
+
+  var sys = 'You are LevelUp, a warm energetic accountability and wellness coach. User stats: streak=' + S.streak + 'd, XP=' + S.xp + '. Projects: ' + (projSummary||'none') + '. Wellness today: ' + wellSummary + '. Keep responses concise (2-3 short paragraphs). Always end with 1-3 bold NEXT ACTIONS. Be encouraging — find silver linings, reframe complaints positively. Use emojis naturally. Search the web for practical solutions to blockers. NEVER access device files — web search only. 🔒';
+
+  try {
+    var msgs = chatH.slice(-8).concat([{ role:'user', content:text }]);
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:sys, tools:[{type:'web_search_20250305',name:'web_search'}], messages:msgs })
+    });
+    var data = await res.json();
+    removeTyping();
+    var reply = '';
+    if (data.content) { for (var i = 0; i < data.content.length; i++) { if (data.content[i].type === 'text') reply += data.content[i].text; } }
+    if (!reply) reply = "I'm having trouble connecting. Tell me what you're working on and I'll coach you through it!";
+    chatH.push({ role:'assistant', content:reply }); addMsg('ai', reply);
+  } catch(e) {
+    removeTyping(); addMsg('ai', "⚠️ Can't reach the web right now, but I'm here for you! 💪 Tell me what's on your mind.");
+  }
+}
+
+// SOS
+function openSOS() {
+  var c = document.getElementById('sos-msgs');
+  if (!c.innerHTML) {
+    var count = 0;
+    for (var i = 0; i < S.projects.length; i++) {
+      for (var j = 0; j < S.projects[i].tasks.length; j++) {
+        if (!S.projects[i].tasks[j].done && !S.projects[i].tasks[j].paused) count++;
+      }
+    }
+    addSOSMsg('ai', 'Hey, breathe. 🌬️\n\nI see ' + count + ' pending tasks. Let\'s find your TOP 1-3 for today.\n\nWhat\'s feeling most overwhelming right now?');
+  }
+  openM('m-sos');
+}
+
+function addSOSMsg(role, text) {
+  var c = document.getElementById('sos-msgs');
+  var d = document.createElement('div'); d.className = 'msg msg-' + role;
+  d.innerHTML = text.replace(/\n/g, '<br>'); c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+
+async function sendSOS() {
+  var inp = document.getElementById('sos-in');
+  var text = inp.value.trim(); if (!text) return;
+  inp.value = ''; addSOSMsg('user', text);
+  var tasks = [];
+  for (var i = 0; i < S.projects.length; i++) {
+    var p = S.projects[i];
+    for (var j = 0; j < p.tasks.length; j++) {
+      if (!p.tasks[j].done && !p.tasks[j].paused) tasks.push(p.tasks[j].name + '(' + p.name + ')');
+    }
+  }
+  var sys = 'You are a calm focused coach helping someone who feels overwhelmed. Their pending tasks: ' + (tasks.join(', ')||'none') + '. Help them pick 1-3 priorities for TODAY only. Keep it to 2-3 sentences then a numbered list. Be warm, calm, and decisive.';
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:350, system:sys, messages:[{role:'user',content:text}] }) });
+    var data = await res.json();
+    var reply = '';
+    if (data.content) { for (var i = 0; i < data.content.length; i++) { if (data.content[i].type === 'text') reply += data.content[i].text; } }
+    addSOSMsg('ai', reply || 'Focus on ONE thing. What absolutely must happen today?');
+  } catch(e) { addSOSMsg('ai', 'Take a breath 🌬️ — pick just ONE task. What matters most right now?'); }
+}
+
+// ══════════════════════════════════════════════
+// WINS / AFFIRMATIONS
+// ══════════════════════════════════════════════
+var AFFS = [
+  '🌟 You are making progress every single day — even tiny steps count!',
+  '💪 Challenges are opportunities in disguise. You\'ve got this!',
+  '🔥 Your consistency is building something extraordinary. Keep going!',
+  '🎯 Focus on progress, not perfection. Done beats perfect every time.',
+  '✨ Every expert was once a beginner. Your growth is happening NOW.',
+  '🌈 Every obstacle you overcome makes you stronger and wiser.',
+  '🚀 You\'ve already come so far. Future you is cheering you on!',
+  '💫 Small actions compound into massive results. Trust the process.',
+  '🌱 Progress over perfection. Growth over comfort. YOU over doubt.',
+  '🏆 You finish what you start. That is a superpower most people lack.',
+  '⚡ One focused hour beats ten distracted ones. You\'ve got this!',
+  '🎊 Celebrate every win — big or small. They all count.',
+  '🌤️ The silver lining is always there. You just have to look for it.',
+  '💜 Rest is productive. Taking care of yourself IS the work.',
+  '🧠 Your mental health matters. Check in with yourself today.'
+];
+
+function newAff() {
+  var el = document.getElementById('affirmation');
+  el.style.opacity = '0';
+  setTimeout(function() {
+    el.textContent = AFFS[Math.floor(Math.random() * AFFS.length)];
+    el.style.opacity = '1'; el.style.transition = 'opacity 0.4s';
+  }, 200);
+}
+
+function renderWins() {
+  newAff(); updateHUD();
+  var el = document.getElementById('wins-list');
+  if (!S.wins || !S.wins.length) {
+    el.innerHTML = '<div class="empty"><div class="ei">🌟</div><div class="et">Your wins appear here!</div><div class="es">Complete tasks and hit milestones.</div></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < S.wins.length; i++) {
+    var w = S.wins[i];
+    html += '<div class="win-card"><div class="win-title">' + w.title + '</div><div class="win-desc">' + w.desc + '</div><div style="font-size:0.7rem;color:var(--muted);margin-top:4px">📅 ' + w.date + ' · +' + w.xp + ' XP</div></div>';
+  }
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════════════════
+async function reqNotif() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+function schedNotif(title, body, delayMs) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  setTimeout(function() {
+    new Notification(title, { body:body, icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🚀</text></svg>' });
+  }, delayMs);
+}
+
+function setupNotifs() {
+  if (S.settings.morning) {
+    var parts = (S.notifTimes.morning || '08:00').split(':');
+    var tgt = new Date(); tgt.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+    if (tgt <= new Date()) tgt.setDate(tgt.getDate() + 1);
+    schedNotif('☀️ Good Morning!', 'Time to LevelUp! Check in and tackle your priorities.', tgt - Date.now());
+  }
+  if (S.settings.evening) {
+    var parts = (S.notifTimes.evening || '20:00').split(':');
+    var tgt = new Date(); tgt.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+    if (tgt <= new Date()) tgt.setDate(tgt.getDate() + 1);
+    schedNotif('🌙 Evening Wrap-Up', 'How did today go? Reflect on your wins!', tgt - Date.now());
+  }
+  if (S.settings.wellness) {
+    schedNotif('💧 Hydration Check!', 'How many cups of water have you had today?', 2*60*60*1000);
+    schedNotif('💊 Supplement Reminder', 'Time to take your afternoon supplements!', 4*60*60*1000);
+  }
+  if (S.settings.rest) {
+    var interval = (S.notifTimes.restInterval || 2) * 60 * 60 * 1000;
+    schedNotif('😌 Rest Break!', 'Step away, stretch, and breathe for 5 minutes. You earn it!', interval);
+    schedNotif('👀 Eye Rest (20-20-20)', 'Look 20 feet away for 20 seconds. Protect your eyes!', interval * 1.5);
+  }
+  if (S.settings.positivity) {
+    var boosts = [
+      ['💪 Keep Going!', 'Every step forward matters. You\'re doing great!'],
+      ['🔥 Streak Alert!', 'Day ' + S.streak + ' — don\'t break that chain!'],
+      ['⚡ Power Up!', 'One focused action creates big momentum. Go!'],
+      ['🌟 You\'ve Got This!', 'Challenges build champions. You are one.']
+    ];
+    var b = boosts[Math.floor(Math.random() * boosts.length)];
+    schedNotif(b[0], b[1], Math.random() * 3 * 60 * 60 * 1000);
+  }
+}
+
+// ══════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════
+function togSet(el, key) {
+  el.classList.toggle('on');
+  S.settings[key] = el.classList.contains('on');
+  save();
+}
+
+function loadSettings() {
+  var keys = Object.keys(S.settings);
+  for (var i = 0; i < keys.length; i++) {
+    var el = document.getElementById('tog-' + keys[i]);
+    if (el) { if (S.settings[keys[i]]) el.classList.add('on'); else el.classList.remove('on'); }
+  }
+  document.getElementById('t-morning').value = S.notifTimes.morning || '08:00';
+  document.getElementById('t-evening').value = S.notifTimes.evening || '20:00';
+  document.getElementById('t-rest-interval').value = S.notifTimes.restInterval || 2;
+}
+
+function saveNotifTimes() {
+  S.notifTimes.morning = document.getElementById('t-morning').value;
+  S.notifTimes.evening = document.getElementById('t-evening').value;
+  S.notifTimes.restInterval = parseInt(document.getElementById('t-rest-interval').value) || 2;
+  save(); toast('💾', 'Notification times saved!');
+}
+
+// ══════════════════════════════════════════════
+// VOICE NOTES
+// ══════════════════════════════════════════════
+var mediaRec, recChunks = [], isRec = false;
+async function toggleMic() {
+  var btn = document.getElementById('mic-btn');
+  if (isRec) {
+    if (mediaRec) mediaRec.stop();
+    isRec = false; btn.classList.remove('rec'); btn.textContent = '🎤'; return;
+  }
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRec = new MediaRecorder(stream); recChunks = [];
+    mediaRec.ondataavailable = function(e) { recChunks.push(e.data); };
+    mediaRec.onstop = function() {
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      toast('🎤', 'Voice note captured!');
+    };
+    mediaRec.start(); isRec = true; btn.classList.add('rec'); btn.textContent = '⏹';
+    toast('🔴', 'Recording... tap ⏹ to stop');
+  } catch(e) { toast('⚠️', 'Microphone access denied'); }
+}
+
+// ══════════════════════════════════════════════
+// RESET
+// ══════════════════════════════════════════════
+function resetAll() {
+  if (confirm('Reset ALL data? This cannot be undone.')) {
+    localStorage.removeItem(KEY); location.reload();
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+function init() {
+  resetDailyWellness();
+  updateHUD();
+  loadSettings();
+  renderHome();
+  renderWLO();
+  renderProjects();
+  newAff();
+  reqNotif().then(setupNotifs);
+  if (!S.lastCheckin) {
+    setTimeout(function() { toast('🚀', 'Welcome to LevelUp! Start your check-in!'); }, 800);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "LevelUp — Accountability & Wellness Coach",
+  "short_name": "LevelUp",
+  "description": "Your personal gamified accountability and wellness coach. Track projects, habits, hydration, supplements, sleep, and more.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3b2070",
+  "theme_color": "#4a2d8a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%234a2d8a'/><text y='140' x='20' font-size='140'>🚀</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "health", "lifestyle"],
+  "prefer_related_applications": false
+}
